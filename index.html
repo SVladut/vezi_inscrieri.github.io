@@ -48,7 +48,7 @@
 
     // 1️⃣ Load data
     function loadData() {
-        fetch("http://localhost:8081/vezi_inscrieri")
+        fetch("https://sitedbsportdatamicro.onrender.com/vezi_inscrieri")
             .then(response => response.json())
             .then(data => {
                 tableData = data;
