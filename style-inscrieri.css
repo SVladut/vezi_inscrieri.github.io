@@ -150,3 +150,21 @@ tr:hover td {
     th, td { font-size:12px; padding:8px; }
     #filterInput { padding:8px; font-size:13px; }
 }
+
+
+.btn {
+    padding:12px 25px;
+    border-radius:10px;
+    background: linear-gradient(135deg,#5500ff,#8a00ff);
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+    color:#fff;
+    transition: all .3s ease;
+    box-shadow:0 0 10px rgba(140,0,255,0.4);
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(170,0,255,0.85);
+}
