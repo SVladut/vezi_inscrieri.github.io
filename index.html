@@ -41,12 +41,21 @@ const nameMap = {
     "plati": "TOTAL SPORTIVI"
 };
 
-// ✅ AFISARE NUME
+// AFISARE NUME
 function getDisplayName(tableName) {
     return nameMap[tableName] || tableName;
 }
 
-// ✅ LOAD DATA
+// APLICARE REGULA TEAM ×3
+function applyTeamRule(row) {
+    let count = row.rowCount;
+    if (row.tableName.toLowerCase().includes("team")) {
+        count = count * 3;
+    }
+    return count;
+}
+
+// LOAD DATA
 async function loadData() {
     try {
         const response = await fetch("https://sitedbsportdatamicro.onrender.com/victoria/vezi_inscrieri");
@@ -61,7 +70,7 @@ async function loadData() {
     }
 }
 
-// ✅ RENDER TABEL + TOTAL INSCRIERI
+// RENDER TABEL
 function renderTable(data) {
     const tbody = document.querySelector("#data-table tbody");
     tbody.innerHTML = "";
@@ -75,9 +84,8 @@ function renderTable(data) {
 
         if (displayName === "TOTAL SPORTIVI") {
             totalSportivi = row;
-        } 
-        else {
-            totalInscrieri += row.rowCount;
+        } else {
+            totalInscrieri += applyTeamRule(row);
             rest.push(row);
         }
     });
@@ -85,7 +93,7 @@ function renderTable(data) {
     // TOTAL SPORTIVI sus
     if (totalSportivi) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>TOTAL SPORTIVI</td><td>${totalSportivi.rowCount}</td>`;
+        tr.innerHTML = `<td>TOTAL SPORTIVI</td><td>${applyTeamRule(totalSportivi)}</td>`;
         tbody.appendChild(tr);
     }
 
@@ -97,32 +105,32 @@ function renderTable(data) {
     // restul randurilor normale
     rest.forEach(row => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${getDisplayName(row.tableName)}</td><td>${row.rowCount}</td>`;
+        tr.innerHTML = `<td>${getDisplayName(row.tableName)}</td><td>${applyTeamRule(row)}</td>`;
         tbody.appendChild(tr);
     });
 }
 
-// ✅ FILTRARE DUPA NUMELE REAL AFISAT
+// FILTRARE
 document.getElementById("filterInput").addEventListener("keyup", function () {
     const value = this.value.toLowerCase();
 
-    const filtered = tableData.filter(row => 
+    const filtered = tableData.filter(row =>
         getDisplayName(row.tableName).toLowerCase().includes(value)
     );
 
     renderTable(filtered);
 });
 
-// ✅ SORTARE
+// SORTARE
 function sortAsc() {
-    renderTable([...tableData].sort((a, b) => a.rowCount - b.rowCount));
+    renderTable([...tableData].sort((a, b) => applyTeamRule(a) - applyTeamRule(b)));
 }
 
 function sortDesc() {
-    renderTable([...tableData].sort((a, b) => b.rowCount - a.rowCount));
+    renderTable([...tableData].sort((a, b) => applyTeamRule(b) - applyTeamRule(a)));
 }
 
-// ✅ EXPORT CSV CU NUME CORECTE
+// EXPORT CSV
 function exportTableToCSV(filename) {
     const csvRows = [["CATEGORIE", "SPORTIVI INSCRISI"]];
 
@@ -130,10 +138,12 @@ function exportTableToCSV(filename) {
 
     tableData.forEach(row => {
         const displayName = getDisplayName(row.tableName);
-        csvRows.push([displayName, row.rowCount]);
+        const count = applyTeamRule(row);
+
+        csvRows.push([displayName, count]);
 
         if (displayName !== "TOTAL SPORTIVI") {
-            totalInscrieri += row.rowCount;
+            totalInscrieri += count;
         }
     });
 
@@ -148,10 +158,10 @@ function exportTableToCSV(filename) {
     link.click();
 }
 
-// ✅ AUTO REFRESH LA 30s
+// AUTO REFRESH
 setInterval(loadData, 30000);
 
-// ✅ INIT
+// INIT
 loadData();
 </script>
 
